@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../../api/axiosInstance';
 import Input from '../../components/UI/Input';
 import Button from '../../components/UI/Button';
 
@@ -39,13 +40,14 @@ export default function CreateUser() {
         const fetchManagers = async () => {
             setLoadingManagers(true);
             try {
-                const res = await fetch('http://localhost:5000/api/admin/managers', {
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                const data = await res.json();
-                if (data.success) {
-                    setManagers(data.data);
+                try {
+                const res = await axiosInstance.get('/admin/managers');
+                if (res.data.success) {
+                    setManagers(res.data.data);
                 }
+            } catch (err) {
+                console.error("Failed to fetch managers", err);
+            }
             } catch (err) {
                 console.error("Failed to fetch managers", err);
             } finally {
@@ -75,15 +77,8 @@ export default function CreateUser() {
         setMessage({ text: '', type: '' });
         setIsSubmitting(true);
         try {
-            const res = await fetch('http://localhost:5000/api/admin/create-user', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify(formData)
-            });
-            const data = await res.json();
+            const res = await axiosInstance.post('/admin/create-user', formData);
+            const data = res.data;
 
             if (data.success) {
                 setMessage({ text: 'User successfully created!', type: 'success' });

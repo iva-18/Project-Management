@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import axiosInstance from '../../api/axiosInstance';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -67,9 +68,7 @@ export default function Projects() {
 
     const fetchProjects = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/projects', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await axiosInstance.get('/projects');
             if (res.data.success) {
                 setProjects(res.data.data);
             }
@@ -82,9 +81,7 @@ export default function Projects() {
 
     const fetchEmployees = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/users/employees', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await axiosInstance.get('/users/employees');
             if (res.data.success) setEmployees(res.data.data);
         } catch (err) {
             console.error(err);
@@ -110,10 +107,9 @@ export default function Projects() {
         if (!editingProject) return;
         setSavingEdit(true);
         try {
-            const res = await axios.put(
-                `http://localhost:5000/api/projects/${editingProject._id}`,
-                editForm,
-                { headers: { Authorization: `Bearer ${token}` } }
+            const res = await axiosInstance.put(
+                `/projects/${editingProject._id}`,
+                editForm
             );
             if (res.data.success) {
                 setProjects(prev => prev.map(p => p._id === editingProject._id ? res.data.data : p));
@@ -139,15 +135,11 @@ export default function Projects() {
     const handleCreateProject = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post('http://localhost:5000/api/projects', formData, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await axiosInstance.post('/projects', formData);
             if (res.data.success) {
                 const projectId = res.data.data._id;
                 // Update workflow immediately as the creation API doesn't pick it up manually
-                await axios.put(`http://localhost:5000/api/projects/${projectId}/workflow`, { workflow: formData.workflow }, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                await axiosInstance.put(`/projects/${projectId}/workflow`, { workflow: formData.workflow });
 
                 setShowModal(false);
                 setFormData({

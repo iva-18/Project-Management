@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axiosInstance from '../../api/axiosInstance';
 import { useAuth } from '../../context/AuthContext';
 
 export default function TaskDetails() {
@@ -84,9 +84,7 @@ export default function TaskDetails() {
 
     const fetchReports = async () => {
         try {
-            const res = await axios.get(`http://localhost:5000/api/daily-reports/task/${id}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await axiosInstance.get(`/daily-reports/task/${id}`);
             if (res.data.success) {
                 setReports(res.data.data);
             }
@@ -98,9 +96,7 @@ export default function TaskDetails() {
     const fetchTask = async () => {
         try {
             setLoading(true);
-            const res = await axios.get(`http://localhost:5000/api/tasks/${id}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await axiosInstance.get(`/tasks/${id}`);
             if (res.data.success) {
                 setTask(res.data.data);
             }
@@ -113,9 +109,7 @@ export default function TaskDetails() {
 
     const fetchSubtasks = async () => {
         try {
-            const res = await axios.get(`http://localhost:5000/api/subtasks/task/${id}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await axiosInstance.get(`/subtasks/task/${id}`);
             if (res.data.success) {
                 setSubtasks(res.data.data || []);
             }
@@ -126,9 +120,7 @@ export default function TaskDetails() {
 
     const fetchCustomStages = async () => {
         try {
-            const res = await axios.get(`http://localhost:5000/api/custom-stages/task/${id}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await axiosInstance.get(`/custom-stages/task/${id}`);
             if (res.data.success) {
                 setCustomStages(res.data.data || []);
             }
@@ -140,13 +132,11 @@ export default function TaskDetails() {
     const handleAddStage = async () => {
         if (!newStage.name.trim()) return;
         try {
-            await axios.post('http://localhost:5000/api/custom-stages', {
+            await axiosInstance.post('/custom-stages', {
                 taskId: id,
                 name: newStage.name,
                 color: newStage.color,
                 orderIndex: customStages.length
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
             });
             setNewStage({ name: '', color: '#14b8a6' });
             fetchCustomStages();
@@ -158,9 +148,7 @@ export default function TaskDetails() {
     const handleDeleteStage = async (stageId) => {
         if (!window.confirm("Delete this stage? Subtasks in this stage will lose their stage reference.")) return;
         try {
-            await axios.delete(`http://localhost:5000/api/custom-stages/${stageId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await axiosInstance.delete(`/custom-stages/${stageId}`);
             fetchCustomStages();
             fetchSubtasks();
         } catch (err) {
@@ -171,12 +159,10 @@ export default function TaskDetails() {
     const handleAddSubtask = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('http://localhost:5000/api/subtasks', {
+            await axiosInstance.post('/subtasks', {
                 parentTaskId: id,
                 ...newSubtask,
                 orderIndex: subtasks.length
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
             });
             setNewSubtask({ title: '', description: '', stage: '', stageColor: '', stageType: '', customStageRef: null, priority: 'Medium', dueDate: '' });
             setIsAddingSubtask(false);
@@ -189,9 +175,7 @@ export default function TaskDetails() {
     const handleDeleteSubtask = async (subtaskId) => {
         if (!window.confirm("Delete this subtask?")) return;
         try {
-            await axios.delete(`http://localhost:5000/api/subtasks/${subtaskId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await axiosInstance.delete(`/subtasks/${subtaskId}`);
             fetchSubtasks();
         } catch (err) {
             console.error("Error deleting subtask:", err);
@@ -200,9 +184,7 @@ export default function TaskDetails() {
 
     const handleUpdateSubtask = async (subtaskId, data) => {
         try {
-            await axios.put(`http://localhost:5000/api/subtasks/${subtaskId}`, data, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await axiosInstance.put(`/subtasks/${subtaskId}`, data);
             fetchSubtasks();
         } catch (err) {
             console.error("Error updating subtask:", err);
@@ -217,9 +199,7 @@ export default function TaskDetails() {
         const reordered = newStages.map((s, idx) => ({ id: s._id, orderIndex: idx }));
         try {
             setCustomStages(newStages);
-            await axios.post('http://localhost:5000/api/custom-stages/reorder', { stages: reordered }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await axiosInstance.post('/custom-stages/reorder', { stages: reordered });
         } catch (err) {
             console.error("Error reordering stages:", err);
             fetchCustomStages();
@@ -230,9 +210,7 @@ export default function TaskDetails() {
         const reordered = newSubtasks.map((s, idx) => ({ id: s._id, orderIndex: idx }));
         try {
             setSubtasks(newSubtasks);
-            await axios.post('http://localhost:5000/api/subtasks/reorder', { subtasks: reordered }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await axiosInstance.post('/subtasks/reorder', { subtasks: reordered });
         } catch (err) {
             console.error("Error reordering subtasks:", err);
             fetchSubtasks();
@@ -242,9 +220,7 @@ export default function TaskDetails() {
     const handleUpdateStatus = async (newStatus) => {
         try {
             setUpdatingStatus(true);
-            const res = await axios.put(`http://localhost:5000/api/tasks/${id}/status`, { status: newStatus }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await axiosInstance.put(`/tasks/${id}/status`, { status: newStatus });
             if (res.data.success) {
                 fetchTask(); // Refresh task to get new activity feed or just trigger a re-render
             }
@@ -260,9 +236,7 @@ export default function TaskDetails() {
         if (!commentText.trim()) return;
 
         try {
-            const res = await axios.post(`http://localhost:5000/api/tasks/${id}/comments`, { text: commentText }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await axiosInstance.post(`/tasks/${id}/comments`, { text: commentText });
             if (res.data.success) {
                 setCommentText('');
                 fetchTask(); // Refresh comments list
@@ -276,11 +250,9 @@ export default function TaskDetails() {
         e.preventDefault();
         try {
             setIsSubmittingReport(true);
-            const res = await axios.post(`http://localhost:5000/api/daily-reports`, {
+            const res = await axiosInstance.post('/daily-reports', {
                 ...reportData,
                 task: id
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
             });
             if (res.data.success) {
                 setReportData({
@@ -303,11 +275,9 @@ export default function TaskDetails() {
 
     const handleReviewReport = async (reportId, isApproved, managerNote) => {
         try {
-            const res = await axios.put(`http://localhost:5000/api/daily-reports/${reportId}/review`, {
+            const res = await axiosInstance.put(`/daily-reports/${reportId}/review`, {
                 isApproved,
                 managerNote
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
             });
             if (res.data.success) {
                 fetchReports();

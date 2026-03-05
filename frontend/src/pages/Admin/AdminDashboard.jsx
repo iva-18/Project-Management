@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../../api/axiosInstance';
 
 export default function AdminDashboard() {
     const { token } = useAuth();
@@ -14,20 +15,16 @@ export default function AdminDashboard() {
     useEffect(() => {
         // Fetch stats
         fetchStats();
-    }, []);
+    }, [token]);
 
     const fetchStats = async () => {
         try {
-            const headers = { Authorization: `Bearer ${token}` };
             const [usersRes, projectsRes] = await Promise.all([
-                fetch('http://localhost:5000/api/admin/users', { headers }),
-                fetch('http://localhost:5000/api/projects', { headers })
+                axiosInstance.get('/admin/users'),
+                axiosInstance.get('/projects')
             ]);
-            const usersData = await usersRes.json();
-            const projectsData = await projectsRes.json();
-
-            const users = usersData.success ? usersData.data : [];
-            const projects = projectsData.success ? projectsData.data : [];
+            const users = usersRes.data.success ? usersRes.data.data : [];
+            const projects = projectsRes.data.success ? projectsRes.data.data : [];
 
             setStats({
                 totalEmployees: users.filter(u => u.role === 'employee').length,
