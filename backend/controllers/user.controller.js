@@ -5,15 +5,15 @@ const User = require('../models/user.model');
 // @access  Private (Admin/Manager)
 exports.getEmployees = async (req, res) => {
     try {
-        const filter = { status: 'Active' };
+        const filter = { status: 'ACTIVE', role: 'employee' };
 
-        // If they want everyone who is an employee
-        filter.role = 'employee';
+        // If the requester is a manager, they should only see employees reporting to them
+        if (req.user && req.user.role === 'manager') {
+            filter.reportingManager = req.user.id;
+        }
 
-        // Only if manager, we might just load employees reporting to them? 
-        // Instructions: 'select employees from dropdown', assume all active employees
         const employees = await User.find(filter)
-            .select('fullName email avatar _id')
+            .select('fullName email avatar role reportingManager _id')
             .sort({ fullName: 1 });
 
         res.status(200).json({ success: true, data: employees });

@@ -99,7 +99,7 @@ export default function CreateUser() {
     };
 
     return (
-        <div className="w-full max-w-5xl mx-auto pb-12">
+        <div className="w-full max-w-[1600px] mx-auto pb-12 px-4 sm:px-6 lg:px-8">
 
             <div className="mb-6">
                 <button
@@ -126,129 +126,138 @@ export default function CreateUser() {
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="flex flex-col gap-8">
+            <form onSubmit={handleSubmit}>
+                <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
 
-                {/* Section 1: Basic Details */}
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.02)] p-6 md:p-8">
-                    <h3 className="text-lg font-bold text-gray-900 mb-6 pb-4 border-b border-gray-50 flex items-center gap-2">
-                        <span className="w-6 h-6 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center text-xs">1</span>
-                        Basic Details
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                        <div>
-                            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Full Name <span className="text-rose-500">*</span></label>
-                            <Input name="fullName" value={formData.fullName} onChange={handleChange} placeholder="John Doe" required />
-                        </div>
-                        <div>
-                            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Email Address <span className="text-rose-500">*</span></label>
-                            <Input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="john.doe@company.com" required />
-                        </div>
-                        <div>
-                            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Phone</label>
-                            <Input type="text" name="phone" value={formData.phone} onChange={handleChange} placeholder="+1 (555) 000-0000" />
-                        </div>
-                        <div>
-                            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Employee ID</label>
-                            <Input type="text" name="employeeId" value={formData.employeeId} onChange={handleChange} placeholder="Leave empty to auto-generate" />
-                            <p className="text-[11px] text-gray-400 mt-1.5 leading-tight">If left blank, system will auto-assign universally unique ID sequentially.</p>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Section 2: Job Information */}
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.02)] p-6 md:p-8">
-                    <h3 className="text-lg font-bold text-gray-900 mb-6 pb-4 border-b border-gray-50 flex items-center gap-2">
-                        <span className="w-6 h-6 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs">2</span>
-                        Job Information
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                        <div>
-                            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Role <span className="text-rose-500">*</span></label>
-                            <select name="role" value={formData.role} onChange={handleChange} className="w-full h-[42px] px-4 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 transition-all bg-gray-50/50 hover:bg-white cursor-pointer" required>
-                                <option value="employee">Employee</option>
-                                <option value="manager">Manager</option>
-                                <option value="admin">Admin</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Status</label>
-                            <select name="status" value={formData.status} onChange={handleChange} className="w-full h-[42px] px-4 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 transition-all bg-gray-50/50 hover:bg-white cursor-pointer">
-                                <option value="Active">Active</option>
-                                <option value="On Leave">On Leave</option>
-                                <option value="Disabled">Disabled</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Department</label>
-                            <Input name="department" value={formData.department} onChange={handleChange} placeholder="E.g. Engineering" />
-                        </div>
-                        <div>
-                            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Job Title</label>
-                            <Input name="jobTitle" value={formData.jobTitle} onChange={handleChange} placeholder="E.g. Full Stack Developer" />
-                        </div>
-                        <div>
-                            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Location / Branch</label>
-                            <Input name="location" value={formData.location} onChange={handleChange} placeholder="E.g. New York Office" />
-                        </div>
-                        <div>
-                            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Employment Type</label>
-                            <select name="employmentType" value={formData.employmentType} onChange={handleChange} className="w-full h-[42px] px-4 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 transition-all bg-gray-50/50 hover:bg-white cursor-pointer">
-                                <option value="Full-time">Full-time</option>
-                                <option value="Part-time">Part-time</option>
-                                <option value="Contract">Contract</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Joining Date</label>
-                            <Input type="date" name="joiningDate" value={formData.joiningDate} onChange={handleChange} />
-                        </div>
-                        <div>
-                            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Reporting Manager</label>
-                            <select name="reportingManager" value={formData.reportingManager} onChange={handleChange} className="w-full h-[42px] px-4 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 transition-all bg-gray-50/50 hover:bg-white cursor-pointer" disabled={loadingManagers}>
-                                <option value="">Select Manager</option>
-                                {managers.map(mgr => (
-                                    <option key={mgr._id} value={mgr._id}>{mgr.fullName} ({mgr.email})</option>
-                                ))}
-                            </select>
+                    {/* LEFT COLUMN: Basic Details & Account Info */}
+                    <div className="xl:col-span-5 flex flex-col gap-8">
+                        {/* Section 1: Basic Details */}
+                        <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.02)] p-6 md:p-8">
+                            <h3 className="text-lg font-bold text-gray-900 mb-6 pb-4 border-b border-gray-50 flex items-center gap-2">
+                                <span className="w-6 h-6 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center text-xs">1</span>
+                                Basic Details
+                            </h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-6">
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Full Name <span className="text-rose-500">*</span></label>
+                                    <Input name="fullName" value={formData.fullName} onChange={handleChange} placeholder="John Doe" required />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Email Address <span className="text-rose-500">*</span></label>
+                                    <Input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="john.doe@company.com" required />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Phone</label>
+                                    <Input type="text" name="phone" value={formData.phone} onChange={handleChange} placeholder="+1 (555) 000-0000" />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Employee ID</label>
+                                    <Input type="text" name="employeeId" value={formData.employeeId} onChange={handleChange} placeholder="Leave empty" />
+                                    <p className="text-[11px] text-gray-400 mt-1.5 leading-tight">System auto-assigns sequentially.</p>
+                                </div>
+                            </div>
                         </div>
 
-                        <div className="md:col-span-2">
-                            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-3">Skills</label>
-                            <div className="flex flex-wrap gap-2">
-                                {availableSkills.map((skill, idx) => (
-                                    <div
-                                        key={idx}
-                                        onClick={() => handleSkillToggle(skill)}
-                                        className={`px-3 py-1.5 rounded-full text-xs font-semibold cursor-pointer transition-colors border ${formData.skills.includes(skill) ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50'}`}
-                                    >
-                                        {skill}
-                                        {formData.skills.includes(skill) && (
-                                            <span className="ml-1.5 opacity-75">×</span>
-                                        )}
-                                    </div>
-                                ))}
+                        {/* Section 3: Account Information */}
+                        <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.02)] p-6 md:p-8 flex-1">
+                            <h3 className="text-lg font-bold text-gray-900 mb-6 pb-4 border-b border-gray-50 flex items-center gap-2">
+                                <span className="w-6 h-6 rounded-md bg-purple-50 text-purple-600 flex items-center justify-center text-xs">3</span>
+                                Account Credentials
+                            </h3>
+                            <div className="grid grid-cols-1 gap-x-6 gap-y-6">
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Temporary Password <span className="text-rose-500">*</span></label>
+                                    <Input type="text" name="password" value={formData.password} onChange={handleChange} placeholder="Generate a secure password" required />
+                                    <p className="text-[11px] text-gray-400 mt-1.5 leading-tight">This user will use this password for their first login. They can change it in settings later.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                {/* Section 3: Account Information */}
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.02)] p-6 md:p-8">
-                    <h3 className="text-lg font-bold text-gray-900 mb-6 pb-4 border-b border-gray-50 flex items-center gap-2">
-                        <span className="w-6 h-6 rounded-md bg-purple-50 text-purple-600 flex items-center justify-center text-xs">3</span>
-                        Account Information
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                        <div>
-                            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Temporary Password <span className="text-rose-500">*</span></label>
-                            <Input type="text" name="password" value={formData.password} onChange={handleChange} placeholder="Generate a secure password" required />
-                            <p className="text-[11px] text-gray-400 mt-1.5 leading-tight">This user will use this password for their first login. They can change it in settings.</p>
+                    {/* RIGHT COLUMN: Job Information */}
+                    <div className="xl:col-span-7 flex flex-col gap-8">
+                        {/* Section 2: Job Information */}
+                        <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.02)] p-6 md:p-8 h-full">
+                            <h3 className="text-lg font-bold text-gray-900 mb-6 pb-4 border-b border-gray-50 flex items-center gap-2">
+                                <span className="w-6 h-6 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs">2</span>
+                                Job Information
+                            </h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Role <span className="text-rose-500">*</span></label>
+                                    <select name="role" value={formData.role} onChange={handleChange} className="w-full h-[42px] px-4 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 transition-all bg-gray-50/50 hover:bg-white cursor-pointer" required>
+                                        <option value="employee">Employee</option>
+                                        <option value="manager">Manager</option>
+                                        <option value="admin">Admin</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Status</label>
+                                    <select name="status" value={formData.status} onChange={handleChange} className="w-full h-[42px] px-4 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 transition-all bg-gray-50/50 hover:bg-white cursor-pointer">
+                                        <option value="Active">Active</option>
+                                        <option value="On Leave">On Leave</option>
+                                        <option value="Disabled">Disabled</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Department</label>
+                                    <Input name="department" value={formData.department} onChange={handleChange} placeholder="E.g. Engineering" />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Job Title</label>
+                                    <Input name="jobTitle" value={formData.jobTitle} onChange={handleChange} placeholder="E.g. Full Stack Developer" />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Location / Branch</label>
+                                    <Input name="location" value={formData.location} onChange={handleChange} placeholder="E.g. New York Office" />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Employment Type</label>
+                                    <select name="employmentType" value={formData.employmentType} onChange={handleChange} className="w-full h-[42px] px-4 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 transition-all bg-gray-50/50 hover:bg-white cursor-pointer">
+                                        <option value="Full-time">Full-time</option>
+                                        <option value="Part-time">Part-time</option>
+                                        <option value="Contract">Contract</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Joining Date</label>
+                                    <Input type="date" name="joiningDate" value={formData.joiningDate} onChange={handleChange} />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Reporting Manager</label>
+                                    <select name="reportingManager" value={formData.reportingManager} onChange={handleChange} className="w-full h-[42px] px-4 border border-gray-200 rounded-lg text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 transition-all bg-gray-50/50 hover:bg-white cursor-pointer" disabled={loadingManagers}>
+                                        <option value="">Select Manager</option>
+                                        {managers.map(mgr => (
+                                            <option key={mgr._id} value={mgr._id}>{mgr.fullName} ({mgr.email})</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="sm:col-span-2">
+                                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-3">Skills</label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {availableSkills.map((skill, idx) => (
+                                            <div
+                                                key={idx}
+                                                onClick={() => handleSkillToggle(skill)}
+                                                className={`px-3 py-1.5 rounded-full text-xs font-semibold cursor-pointer transition-colors border ${formData.skills.includes(skill) ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50'}`}
+                                            >
+                                                {skill}
+                                                {formData.skills.includes(skill) && (
+                                                    <span className="ml-1.5 opacity-75">×</span>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
+
                 </div>
 
                 {/* Actions */}
-                <div className="flex justify-end gap-4 border-t border-gray-100 pt-6">
+                <div className="flex justify-end gap-4 border-t border-gray-100 pt-6 mt-8">
                     <Button type="button" variant="outline" onClick={() => navigate(-1)} className="px-6">Cancel</Button>
                     <Button type="submit" variant="primary" disabled={isSubmitting} className="shadow-md px-8 disabled:opacity-75 disabled:cursor-not-allowed">
                         {isSubmitting ? 'Creating...' : 'Create User'}

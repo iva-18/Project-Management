@@ -36,9 +36,28 @@ exports.createUser = async (req, res) => {
         // Handle auto-generation of Employee ID
         let generatedEmployeeId = employeeId;
         if (!generatedEmployeeId || generatedEmployeeId.trim() === '') {
-            const count = await User.countDocuments();
-            // Prefix padded with 0s like EMP-0001
-            generatedEmployeeId = `EMP-${(count + 1).toString().padStart(4, '0')}`;
+            let nextId = 1;
+            // Find the most recently created user that has an auto-generated EMP- pattern
+            const lastUser = await User.findOne({ employeeId: /^EMP-\d+$/ }).sort({ _id: -1 });
+            if (lastUser && lastUser.employeeId) {
+                const numStr = lastUser.employeeId.replace('EMP-', '');
+                const num = parseInt(numStr, 10);
+                if (!isNaN(num)) {
+                    nextId = num + 1;
+                }
+            }
+
+            // Ensure the generated ID is unique
+            let isUnique = false;
+            while (!isUnique) {
+                generatedEmployeeId = `EMP-${nextId.toString().padStart(4, '0')}`;
+                const existing = await User.findOne({ employeeId: generatedEmployeeId });
+                if (existing) {
+                    nextId++;
+                } else {
+                    isUnique = true;
+                }
+            }
         } else {
             // Check if passed employeeId already exists
             const empIdExists = await User.findOne({ employeeId: generatedEmployeeId });
