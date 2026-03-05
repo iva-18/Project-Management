@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import axiosInstance from '../../api/axiosInstance';
 import { useAuth } from '../../context/AuthContext';
 
 export default function ProjectDetails() {
@@ -54,9 +55,7 @@ export default function ProjectDetails() {
 
     const handleSaveWorkflow = async () => {
         try {
-            const res = await axios.put(`http://localhost:5000/api/projects/${id}/workflow`, { workflow: localWorkflow }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await axiosInstance.put(`/projects/${id}/workflow`, { workflow: localWorkflow });
             if (res.data.success) {
                 setProject(res.data.data);
                 setShowWorkflowModal(false);
@@ -73,10 +72,9 @@ export default function ProjectDetails() {
     const fetchData = async () => {
         try {
             setLoading(true);
-            const headers = { Authorization: `Bearer ${token}` };
             const [projRes, tasksRes] = await Promise.all([
-                axios.get(`http://localhost:5000/api/projects/${id}`, { headers }),
-                axios.get(`http://localhost:5000/api/tasks?projectId=${id}`, { headers })
+                axiosInstance.get(`/projects/${id}`),
+                axiosInstance.get(`/tasks?projectId=${id}`)
             ]);
 
             if (projRes.data.success) setProject(projRes.data.data);
@@ -91,9 +89,7 @@ export default function ProjectDetails() {
     const fetchSubtasksForTask = async (taskId) => {
         if (taskSubtasks[taskId]) return; // already fetched
         try {
-            const res = await axios.get(`http://localhost:5000/api/subtasks/task/${taskId}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await axiosInstance.get(`/subtasks/task/${taskId}`);
             if (res.data.success) {
                 setTaskSubtasks(prev => ({ ...prev, [taskId]: res.data.data }));
             }
@@ -109,9 +105,7 @@ export default function ProjectDetails() {
     const handleCreateTask = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post(`http://localhost:5000/api/projects/${id}/tasks`, taskForm, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await axiosInstance.post(`/projects/${id}/tasks`, taskForm);
             if (res.data.success) {
                 // To display full populated details, refetch tasks
                 fetchData();
@@ -125,9 +119,7 @@ export default function ProjectDetails() {
 
     const updateTaskStatus = async (taskId, newStatus) => {
         try {
-            await axios.put(`http://localhost:5000/api/tasks/${taskId}/status`, { status: newStatus }, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await axiosInstance.put(`/tasks/${taskId}/status`, { status: newStatus });
             setTasks(tasks.map(t => t._id === taskId ? { ...t, status: newStatus } : t));
         } catch (err) {
             console.error(err);

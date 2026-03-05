@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import axiosInstance from '../../api/axiosInstance';
 import { useAuth } from '../../context/AuthContext';
 
 export default function Notifications() {
@@ -13,9 +13,7 @@ export default function Notifications() {
 
     const fetchNotifications = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/notifications', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await axiosInstance.get('/notifications');
             if (res.data.success) {
                 setNotifications(res.data.data);
             }
@@ -28,9 +26,7 @@ export default function Notifications() {
 
     const markAsRead = async (id) => {
         try {
-            await axios.put(`http://localhost:5000/api/notifications/${id}/read`, {}, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await axiosInstance.put(`/notifications/${id}/read`);
             setNotifications(prev =>
                 prev.map(n => n._id === id ? { ...n, isRead: true } : n)
             );

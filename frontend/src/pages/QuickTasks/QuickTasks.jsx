@@ -78,11 +78,11 @@ export default function QuickTasks() {
     // ── fetch users list (admin/manager only — employees can only self-assign) ─
     useEffect(() => {
         if (user?.role !== 'employee') {
-            fetch('http://localhost:5000/api/admin/users', {
-                headers: { Authorization: `Bearer ${token}` }
-            }).then(r => r.json()).then(d => {
-                if (d.success) setUsers(d.data);
-            }).catch(() => { });
+            axiosInstance.get('/admin/users')
+                .then(r => {
+                    if (r.data.success) setUsers(r.data.data);
+                })
+                .catch(() => { });
         }
     }, [token, user]);
 

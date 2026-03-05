@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import axiosInstance from '../../api/axiosInstance';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 
@@ -24,13 +24,12 @@ export default function Dashboard() {
     const fetchDashboardData = async () => {
         setLoading(true);
         try {
-            const headers = { Authorization: `Bearer ${token}` };
             const [tasksRes, projectsRes, activityRes, employeeRes, summaryRes] = await Promise.all([
-                axios.get('http://localhost:5000/api/tasks', { headers }),
-                axios.get('http://localhost:5000/api/projects', { headers }),
-                axios.get('http://localhost:5000/api/activity', { headers }),
-                axios.get('http://localhost:5000/api/users/employees', { headers }),
-                axios.get('http://localhost:5000/api/daily-reports/manager-summary', { headers })
+                axiosInstance.get('/tasks'),
+                axiosInstance.get('/projects'),
+                axiosInstance.get('/activity'),
+                axiosInstance.get('/users/employees'),
+                axiosInstance.get('/daily-reports/manager-summary')
             ]);
 
             if (tasksRes.data.success) setTasks(tasksRes.data.data || []);
@@ -54,9 +53,8 @@ export default function Dashboard() {
         setReviewingId(reportId);
         try {
             const comment = reviewComment[reportId] || '';
-            await axios.put(`http://localhost:5000/api/daily-reports/${reportId}/review`,
-                { isApproved, managerNote: comment },
-                { headers: { Authorization: `Bearer ${token}` } }
+            await axiosInstance.put(`/daily-reports/${reportId}/review`,
+                { isApproved, managerNote: comment }
             );
             setShowCommentFor(null);
             fetchDashboardData(); // Re-fetch to get updated statuses

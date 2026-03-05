@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import axiosInstance from '../../api/axiosInstance';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -13,9 +13,7 @@ export default function Activity() {
     useEffect(() => {
         const fetchActivities = async () => {
             try {
-                const res = await axios.get('http://localhost:5000/api/activity', {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const res = await axiosInstance.get('/activity');
                 if (res.data.success) {
                     setActivities(res.data.data);
                 }

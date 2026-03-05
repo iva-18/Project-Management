@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../../api/axiosInstance';
 
 export default function UsersList() {
     const { token } = useAuth();
@@ -29,12 +30,9 @@ export default function UsersList() {
 
     const fetchUsers = async () => {
         try {
-            const res = await fetch('http://localhost:5000/api/admin/users', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            const data = await res.json();
-            if (data.success) {
-                setUsers(data.data);
+            const res = await axiosInstance.get('/admin/users');
+            if (res.data.success) {
+                setUsers(res.data.data);
             }
         } catch (error) {
             console.error('Failed to fetch users', error);
@@ -72,15 +70,8 @@ export default function UsersList() {
     const handleSubmitEdit = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch(`http://localhost:5000/api/admin/users/${editingUser._id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
-                },
-                body: JSON.stringify(formData)
-            });
-            const data = await res.json();
+            const res = await axiosInstance.put(`/admin/users/${editingUser._id}`, formData);
+            const data = res.data;
             if (data.success) {
                 // Instantly update user in state without full re-fetch
                 setUsers(prev => prev.map(u => u._id === editingUser._id ? { ...u, ...data.data } : u));
@@ -98,11 +89,8 @@ export default function UsersList() {
     const handleToggleDisable = async (user) => {
         setActionError('');
         try {
-            const res = await fetch(`http://localhost:5000/api/admin/users/${user._id}/disable`, {
-                method: 'PATCH',
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            const data = await res.json();
+            const res = await axiosInstance.patch(`/admin/users/${user._id}/disable`);
+            const data = res.data;
             if (data.success) {
                 // Instantly update status in state
                 setUsers(prev =>
@@ -134,11 +122,8 @@ export default function UsersList() {
         setDeleteLoading(true);
         setActionError('');
         try {
-            const res = await fetch(`http://localhost:5000/api/admin/users/${deletingUser._id}`, {
-                method: 'DELETE',
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            const data = await res.json();
+            const res = await axiosInstance.delete(`/admin/users/${deletingUser._id}`);
+            const data = res.data;
             if (data.success) {
                 // Remove user from UI instantly — no page refresh
                 setUsers(prev => prev.filter(u => u._id !== deletingUser._id));

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { useAuth } from '../../context/AuthContext';
-import axios from 'axios';
+import axiosInstance from '../../api/axiosInstance';
 import { useNavigate, Link } from 'react-router-dom';
 
 
@@ -26,9 +26,7 @@ export default function EmployeeDashboard() {
 
     const checkReports = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/daily-reports/check-today', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await axiosInstance.get('/daily-reports/check-today');
             if (res.data.success && res.data.data && !res.data.data.isSubmittedToday) {
                 setMissingTasks(res.data.data.missingTasks || []);
                 // Only show reminder after certain time or just every login
@@ -43,9 +41,9 @@ export default function EmployeeDashboard() {
         setLoading(true);
         try {
             const [tasksRes, projectsRes, activityRes] = await Promise.all([
-                axios.get('http://localhost:5000/api/tasks', { headers: { Authorization: `Bearer ${token}` } }),
-                axios.get('http://localhost:5000/api/projects', { headers: { Authorization: `Bearer ${token}` } }),
-                axios.get('http://localhost:5000/api/activity', { headers: { Authorization: `Bearer ${token}` } })
+                axiosInstance.get('/tasks'),
+                axiosInstance.get('/projects'),
+                axiosInstance.get('/activity')
             ]);
 
             if (tasksRes.data.success) setTasks(tasksRes.data.data);
