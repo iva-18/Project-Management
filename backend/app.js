@@ -22,7 +22,7 @@ const app = express();
 // ✅ CORS — must be FIRST, before all other middleware
 const corsOptions = {
     origin: function (origin, callback) {
-        const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173')
+        const allowedOrigins = (process.env.CORS_ORIGIN || 'https://task.gitakshmi.com')
             .split(',')
             .map(o => o.trim());
         // Allow no-origin requests (Postman, mobile apps, server-to-server)

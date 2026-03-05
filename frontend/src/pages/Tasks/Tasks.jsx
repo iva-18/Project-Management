@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import axios from 'axios';
+import axiosInstance from '../../api/axiosInstance';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -216,9 +216,7 @@ function TaskRow({ task, isEmployee, token, onNavigate }) {
         if (subtasksFetched) return;
         setLoadingSubs(true);
         try {
-            const res = await axios.get(`http://localhost:5000/api/subtasks/task/${task._id}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await axiosInstance.get(`/subtasks/task/${task._id}`);
             if (res.data.success) {
                 setSubtasks(res.data.data);
                 setSubtasksFetched(true);
@@ -229,9 +227,7 @@ function TaskRow({ task, isEmployee, token, onNavigate }) {
 
     const fetchStages = useCallback(async () => {
         try {
-            const res = await axios.get(`http://localhost:5000/api/custom-stages/task/${task._id}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await axiosInstance.get(`/custom-stages/task/${task._id}`);
             if (res.data.success) setCustomStages(res.data.data);
         } catch (e) { /* ignore */ }
     }, [task._id, token]);
@@ -243,9 +239,7 @@ function TaskRow({ task, isEmployee, token, onNavigate }) {
 
     const handleUpdate = async (id, data) => {
         try {
-            await axios.put(`http://localhost:5000/api/subtasks/${id}`, data, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await axiosInstance.put(`/subtasks/${id}`, data);
             setSubtasks(p => p.map(s => s._id === id ? { ...s, ...data } : s));
         } catch (e) { console.error(e); }
     };
@@ -253,9 +247,7 @@ function TaskRow({ task, isEmployee, token, onNavigate }) {
     const handleDelete = async (id) => {
         if (!window.confirm('Delete this subtask?')) return;
         try {
-            await axios.delete(`http://localhost:5000/api/subtasks/${id}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            await axiosInstance.delete(`/subtasks/${id}`);
             setSubtasks(p => p.filter(s => s._id !== id));
         } catch (e) { console.error(e); }
     };
@@ -263,11 +255,11 @@ function TaskRow({ task, isEmployee, token, onNavigate }) {
     const handleAdd = async () => {
         if (!newSub.title.trim()) return;
         try {
-            const res = await axios.post('http://localhost:5000/api/subtasks', {
+            const res = await axiosInstance.post('/subtasks', {
                 parentTaskId: task._id,
                 ...newSub,
                 orderIndex: subtasks.length
-            }, { headers: { Authorization: `Bearer ${token}` } });
+            });
             if (res.data.success) {
                 setSubtasks(p => [...p, res.data.data]);
                 setNewSub({ title: '', stage: '', stageColor: '', stageType: 'project', customStageRef: null, priority: 'Medium', dueDate: '' });
@@ -279,9 +271,9 @@ function TaskRow({ task, isEmployee, token, onNavigate }) {
     const handleReorder = async (newList) => {
         setSubtasks(newList);
         try {
-            await axios.post('http://localhost:5000/api/subtasks/reorder', {
+            await axiosInstance.post('/subtasks/reorder', {
                 subtasks: newList.map((s, i) => ({ id: s._id, orderIndex: i }))
-            }, { headers: { Authorization: `Bearer ${token}` } });
+            });
         } catch (e) { console.error(e); }
     };
 
@@ -558,9 +550,7 @@ export default function Tasks() {
 
     const fetchTasks = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/tasks', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
+            const res = await axiosInstance.get('/tasks');
             if (res.data.success) setTasks(res.data.data);
         } catch (err) {
             console.error(err);

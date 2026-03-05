@@ -1,63 +1,39 @@
-const BASE = 'http://localhost:5000/api/quick-tasks';
+import axiosInstance from './axiosInstance';
 
-const authHeaders = (token) => ({
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${token}`
-});
+const BASE = '/quick-tasks';
 
 export const quickTaskApi = {
-    getAll: async (token, params = {}) => {
+    getAll: async (params = {}) => {
         const query = new URLSearchParams(params).toString();
-        const res = await fetch(`${BASE}${query ? '?' + query : ''}`, {
-            headers: authHeaders(token)
-        });
-        return res.json();
+        const res = await axiosInstance.get(`${BASE}${query ? '?' + query : ''}`);
+        return res.data;
     },
-    getStats: async (token) => {
-        const res = await fetch(`${BASE}/stats`, { headers: authHeaders(token) });
-        return res.json();
+    getStats: async () => {
+        const res = await axiosInstance.get(`${BASE}/stats`);
+        return res.data;
     },
-    getById: async (token, id) => {
-        const res = await fetch(`${BASE}/${id}`, { headers: authHeaders(token) });
-        return res.json();
+    getById: async (id) => {
+        const res = await axiosInstance.get(`${BASE}/${id}`);
+        return res.data;
     },
-    create: async (token, data) => {
-        const res = await fetch(BASE, {
-            method: 'POST',
-            headers: authHeaders(token),
-            body: JSON.stringify(data)
-        });
-        return res.json();
+    create: async (data) => {
+        const res = await axiosInstance.post(BASE, data);
+        return res.data;
     },
-    update: async (token, id, data) => {
-        const res = await fetch(`${BASE}/${id}`, {
-            method: 'PUT',
-            headers: authHeaders(token),
-            body: JSON.stringify(data)
-        });
-        return res.json();
+    update: async (id, data) => {
+        const res = await axiosInstance.put(`${BASE}/${id}`, data);
+        return res.data;
     },
-    delete: async (token, id) => {
-        const res = await fetch(`${BASE}/${id}`, {
-            method: 'DELETE',
-            headers: authHeaders(token)
-        });
-        return res.json();
+    delete: async (id) => {
+        const res = await axiosInstance.delete(`${BASE}/${id}`);
+        return res.data;
     },
-    addComment: async (token, id, text) => {
-        const res = await fetch(`${BASE}/${id}/comments`, {
-            method: 'POST',
-            headers: authHeaders(token),
-            body: JSON.stringify({ text })
-        });
-        return res.json();
+    addComment: async (id, text) => {
+        const res = await axiosInstance.post(`${BASE}/${id}/comments`, { text });
+        return res.data;
     },
-    toggleChecklist: async (token, taskId, itemId, completed) => {
-        const res = await fetch(`${BASE}/${taskId}/checklist/${itemId}`, {
-            method: 'PATCH',
-            headers: authHeaders(token),
-            body: JSON.stringify({ completed })
-        });
-        return res.json();
+    updateChecklistItem: async (taskId, itemId, completed) => {
+        const res = await axiosInstance.patch(`${BASE}/${taskId}/checklist/${itemId}`, { completed });
+        return res.data;
     }
 };
