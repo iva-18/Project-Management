@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import axiosInstance from '../../api/axiosInstance';
 import { quickTaskApi } from '../../api/quickTask.api';
+import axiosInstance from '../../api/axiosInstance';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const PRIORITIES = ['LOW', 'MEDIUM', 'HIGH', 'URGENT'];
@@ -73,6 +74,9 @@ export default function QuickTasks() {
     const [commentText, setCommentText] = useState('');
     const [commentSaving, setCommentSaving] = useState(false);
 
+    // ── error state ───────────────────────────────────────────────────────
+    const [error, setError] = useState('');
+
     // ── users for assign dropdown ─────────────────────────────────────────
     const [users, setUsers] = useState([]);
 
@@ -85,11 +89,12 @@ export default function QuickTasks() {
                 })
                 .catch(() => { });
         }
-    }, [token, user]);
+    }, [user]);
 
     // ─── Fetch tasks ─────────────────────────────────────────────────────
     const fetchTasks = useCallback(async (page = 1) => {
         setLoading(true);
+        setError('');
         try {
             const params = { page, limit: 15 };
             if (view !== 'all') params.view = view;
@@ -97,7 +102,7 @@ export default function QuickTasks() {
             if (filters.priority) params.priority = filters.priority;
             if (filters.category) params.category = filters.category;
 
-            const data = await quickTaskApi.getAll(token, params);
+            const data = await quickTaskApi.getAll(params);
             if (data.success) {
                 let list = data.data;
                 // Client-side search filter
@@ -110,22 +115,28 @@ export default function QuickTasks() {
                 }
                 setTasks(list);
                 setPagination(data.pagination || { total: list.length, page: 1, pages: 1 });
+            } else {
+                setError(data.message || 'Failed to load tasks');
             }
-        } catch (_) { }
+        } catch (err) {
+            setError(err?.response?.data?.message || 'Failed to connect to server. Please try again.');
+        }
         finally { setLoading(false); }
-    }, [token, view, filters, search]);
+    }, [view, filters, search]);
 
     // ─── Fetch stats ─────────────────────────────────────────────────────
     const fetchStats = useCallback(async () => {
-        const data = await quickTaskApi.getStats(token);
-        if (data.success) setStats(data.data);
-    }, [token]);
+        try {
+            const data = await quickTaskApi.getStats();
+            if (data.success) setStats(data.data);
+        } catch (_) { }
+    }, []);
 
     useEffect(() => { fetchTasks(1); fetchStats(); }, [fetchTasks, fetchStats]);
 
     // ─── Refresh detail task if open ─────────────────────────────────────
     const refreshDetail = async (id) => {
-        const data = await quickTaskApi.getById(token, id);
+        const data = await quickTaskApi.getById(id);
         if (data.success) setDetailTask(data.data);
     };
 
@@ -189,9 +200,9 @@ export default function QuickTasks() {
 
             let res;
             if (editTask) {
-                res = await quickTaskApi.update(token, editTask._id, payload);
+                res = await quickTaskApi.update(editTask._id, payload);
             } else {
-                res = await quickTaskApi.create(token, payload);
+                res = await quickTaskApi.create(payload);
             }
 
             if (res.success) {
@@ -217,7 +228,7 @@ export default function QuickTasks() {
         if (!deleteTarget) return;
         setDeleting(true);
         try {
-            const res = await quickTaskApi.delete(token, deleteTarget._id);
+            const res = await quickTaskApi.delete(deleteTarget._id);
             if (res.success) {
                 setTasks(p => p.filter(t => t._id !== deleteTarget._id));
                 setDeleteTarget(null);
@@ -232,7 +243,7 @@ export default function QuickTasks() {
     const cycleStatus = async (task) => {
         const order = ['TODO', 'IN_PROGRESS', 'DONE'];
         const next = order[(order.indexOf(task.status) + 1) % order.length];
-        const res = await quickTaskApi.update(token, task._id, { status: next });
+        const res = await quickTaskApi.update(task._id, { status: next });
         if (res.success) {
             setTasks(p => p.map(t => t._id === task._id ? { ...t, status: next } : t));
             if (detailTask?._id === task._id) setDetailTask(d => ({ ...d, status: next }));
@@ -242,7 +253,7 @@ export default function QuickTasks() {
 
     // ─── Checklist toggle (in detail drawer) ─────────────────────────────
     const toggleChecklist = async (taskId, itemId, completed) => {
-        const res = await quickTaskApi.toggleChecklist(token, taskId, itemId, completed);
+        const res = await quickTaskApi.toggleChecklist(taskId, itemId, completed);
         if (res.success) {
             setDetailTask(d => ({ ...d, checklist: res.data }));
             setTasks(p => p.map(t => t._id === taskId ? { ...t, checklist: res.data } : t));
@@ -253,7 +264,7 @@ export default function QuickTasks() {
     const handleAddComment = async () => {
         if (!commentText.trim() || !detailTask) return;
         setCommentSaving(true);
-        const res = await quickTaskApi.addComment(token, detailTask._id, commentText);
+        const res = await quickTaskApi.addComment(detailTask._id, commentText);
         if (res.success) {
             setDetailTask(d => ({ ...d, comments: res.data }));
             setCommentText('');
@@ -281,6 +292,17 @@ export default function QuickTasks() {
     // ═══════════════════════════════════════════════════════════════════════
     return (
         <div className="min-h-full">
+
+            {/* ── ERROR BANNER ─────────────────────────────────────────── */}
+            {error && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm font-medium flex items-center gap-3">
+                    <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {error}
+                    <button onClick={() => fetchTasks(1)} className="ml-auto text-xs font-bold text-red-600 underline hover:text-red-800">Retry</button>
+                </div>
+            )}
 
             {/* ── PAGE HEADER ─────────────────────────────────────────── */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
